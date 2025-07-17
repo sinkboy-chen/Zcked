@@ -9,70 +9,77 @@
   <link rel="stylesheet" href="qr-tool-style.css">
 </head>
 <body>
-  <main class="wrapper" style="padding-top:1em; max-width: 600px; margin: auto;">
-    <!-- Scan Section -->
-    <section class="section" id="scan-section">
-      <h2>1. Scan QR Code</h2>
-      <div class="btn-row">
-        <button id="scan-mode-camera" class="button button-outline" type="button">Camera</button>
-        <button id="scan-mode-image" class="button button-outline" type="button">Image Upload</button>
-      </div>
-      <div id="camera-scan" style="display:none;">
-        <video id="scan-video" width="256" height="192" style="border:1px solid #ccc;"></video><br>
-        <button id="start-camera-btn" class="button">Start Camera Scan</button>
-        <button id="reset-camera-btn" class="button">Reset</button>
-      </div>
-      <div id="image-scan" style="display:none;">
-        <input type="file" id="scan-file-input" accept="image/*">
-        <div class="qr-img-box" id="scan-img-box"></div>
-      </div>
-      <div id="scan-result-meta" class="meta"></div>
-      <div class="qr-img-box" id="scan-result-img-box"></div>
-      <button id="use-scan-btn" class="button" style="display:none;">Use this for QR creation</button>
-    </section>
-
-    <!-- Create/Edit Section -->
-    <section class="section" id="create-section">
-      <h2>2. Create/Edit QR Code</h2>
-      <form id="create-form" onsubmit="return false;">
-        <div class="input-row" style="flex-direction:column; align-items:stretch; gap:0.5em;">
-          <label for="create-text">QR Data (Text)</label>
-          <textarea id="create-text" rows="4" style="resize:vertical; min-width:100%; font-family:monospace;" required autofocus placeholder="Enter or paste your QR data here..."></textarea>
-          <div style="display:flex; gap:1em; align-items:flex-end; margin-top:0.5em; flex-wrap:wrap;">
-            <label for="create-version">Version<br>
-              <input type="number" id="create-version" min="1" max="40" placeholder="auto">
-            </label>
-            <label for="create-eclevel">EC Level<br>
-              <select id="create-eclevel">
-                <option value="L">L (Low)</option>
-                <option value="M">M (Medium)</option>
-                <option value="Q">Q (Quartile)</option>
-                <option value="H" selected>H (High)</option>
-              </select>
-            </label>
-            <button type="submit" class="button">Generate QR</button>
-            <button type="button" id="clear-create-btn" class="button button-outline">Clear</button>
-          </div>
+  <main class="wrapper">
+    <!-- Tab navigation for mobile (hidden on desktop, shown on mobile via CSS) -->
+    <nav class="tab-nav">
+      <button class="tab-btn" data-tab="scan" type="button">Scan</button>
+      <button class="tab-btn" data-tab="create" type="button">Create/Edit</button>
+      <button class="tab-btn" data-tab="output" type="button">Output</button>
+      <button class="tab-btn" data-tab="history" type="button">History</button>
+    </nav>
+    <div class="main-content">
+      <!-- Scan Section -->
+      <section class="section" id="scan-section" data-tab="scan">
+        <h2>1. Scan QR Code</h2>
+        <div class="btn-row">
+          <button id="scan-mode-camera" class="button button-outline" type="button">Camera</button>
+          <button id="scan-mode-image" class="button button-outline" type="button">Image Upload</button>
         </div>
-      </form>
-    </section>
+        <div id="camera-scan" style="display:none;">
+          <video id="scan-video" width="256" height="192" style="border:1px solid #ccc;"></video><br>
+          <button id="start-camera-btn" class="button">Start Camera Scan</button>
+          <button id="reset-camera-btn" class="button">Reset</button>
+        </div>
+        <div id="image-scan" style="display:none;">
+          <input type="file" id="scan-file-input" accept="image/*">
+          <div class="qr-img-box" id="scan-img-box"></div>
+        </div>
+        <div id="scan-result-meta" class="meta"></div>
+        <div class="qr-img-box" id="scan-result-img-box"></div>
+        <button id="use-scan-btn" class="button" style="display:none;">Use this for QR creation</button>
+      </section>
 
-    <!-- History Section -->
-    <section class="section" id="history-section">
-      <h2>4. History</h2>
+      <!-- Create/Edit Section -->
+      <section class="section" id="create-section" data-tab="create">
+        <h2>2. Create/Edit QR Code</h2>
+        <form id="create-form" onsubmit="return false;">
+          <div class="input-row" style="flex-direction:column; align-items:stretch; gap:0.5em;">
+            <label for="create-text">QR Data (Text)</label>
+            <textarea id="create-text" rows="4" style="resize:vertical; min-width:100%; font-family:monospace;" required autofocus placeholder="Enter or paste your QR data here..."></textarea>
+            <div style="display:flex; gap:1em; align-items:flex-end; margin-top:0.5em; flex-wrap:wrap;">
+              <label for="create-version">Version<br>
+                <input type="number" id="create-version" min="1" max="40" placeholder="auto">
+              </label>
+              <label for="create-eclevel">EC Level<br>
+                <select id="create-eclevel">
+                  <option value="L">L (Low)</option>
+                  <option value="M">M (Medium)</option>
+                  <option value="Q">Q (Quartile)</option>
+                  <option value="H" selected>H (High)</option>
+                </select>
+              </label>
+              <button type="submit" class="button">Generate QR</button>
+              <button type="button" id="clear-create-btn" class="button button-outline">Clear</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Output Section -->
+      <section class="section output-section" id="output-section" data-tab="output">
+        <h2>3. Output</h2>
+        <div class="qr-img-box" id="output-qr-box"></div>
+        <div id="output-meta" class="meta"></div>
+        <div class="btn-row">
+          <button id="download-btn" class="button" type="button">Download PNG</button>
+          <button id="copy-btn" class="button" type="button">Copy to Clipboard</button>
+        </div>
+      </section>
+    </div>
+    <aside class="history-sidebar" id="history-section" data-tab="history">
+      <h2>History</h2>
       <div id="history-list" style="max-height:300px; overflow-y:auto; border:1px solid #eee; background:#fafbfc; padding:0.5em;"></div>
-    </section>
-
-    <!-- Output Section -->
-    <section class="section output-section" id="output-section">
-      <h2>3. Output</h2>
-      <div class="qr-img-box" id="output-qr-box"></div>
-      <div id="output-meta" class="meta"></div>
-      <div class="btn-row">
-        <button id="download-btn" class="button" type="button">Download PNG</button>
-        <button id="copy-btn" class="button" type="button">Copy to Clipboard</button>
-      </div>
-    </section>
+    </aside>
   </main>
   <script src="library/dist/umd/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
