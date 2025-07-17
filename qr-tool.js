@@ -27,7 +27,7 @@ function showScanMode(mode) {
     scanResultMeta.textContent = '';
     scanImgBox.innerHTML = '';
   }
-  scanResultImgBox.innerHTML = '';
+  if (scanResultImgBox) scanResultImgBox.innerHTML = '';
   useScanBtn.style.display = 'none';
   lastScanResult = null;
 }
@@ -47,7 +47,7 @@ let selectedDeviceId = null;
 // Camera scan logic
 startCameraBtn.onclick = async () => {
   scanResultMeta.textContent = '';
-  scanResultImgBox.innerHTML = '';
+  if (scanResultImgBox) scanResultImgBox.innerHTML = '';
   useScanBtn.style.display = 'none';
   if (!scanCodeReader) scanCodeReader = new ZXing.BrowserQRCodeReader();
   try {
@@ -75,7 +75,7 @@ startCameraBtn.onclick = async () => {
     console.log('Using deviceId:', selectedDeviceId);
     scanCodeReader.decodeFromInputVideoDevice(selectedDeviceId, scanVideo).then(result => {
       scanResultMeta.innerHTML = `<b>Text:</b> ${result.text}<br><b>Version:</b> ${result.version ?? '-'}<br><b>EC Level:</b> ${(result.resultMetadata && result.resultMetadata.get(3)) || '-'}`;
-      scanResultImgBox.innerHTML = '';
+      if (scanResultImgBox) scanResultImgBox.innerHTML = '';
       useScanBtn.style.display = '';
       lastScanResult = result;
       addHistoryEntry('Scan', result.text, result.version, (result.resultMetadata && result.resultMetadata.get(3)) || '-');
@@ -91,7 +91,7 @@ startCameraBtn.onclick = async () => {
 resetCameraBtn.onclick = () => {
   if (scanCodeReader) scanCodeReader.reset();
   scanResultMeta.textContent = '';
-  scanResultImgBox.innerHTML = '';
+  if (scanResultImgBox) scanResultImgBox.innerHTML = '';
   useScanBtn.style.display = 'none';
   lastScanResult = null;
 };
@@ -99,7 +99,7 @@ resetCameraBtn.onclick = () => {
 // Image scan logic
 scanFileInput.onchange = function(e) {
   scanResultMeta.textContent = '';
-  scanResultImgBox.innerHTML = '';
+  if (scanResultImgBox) scanResultImgBox.innerHTML = '';
   useScanBtn.style.display = 'none';
   lastScanResult = null;
   scanImgBox.innerHTML = '';
@@ -113,7 +113,7 @@ scanFileInput.onchange = function(e) {
     if (!scanCodeReader) scanCodeReader = new ZXing.BrowserQRCodeReader();
     scanCodeReader.decodeFromImage(img).then(result => {
       scanResultMeta.innerHTML = `<b>Text:</b> ${result.text}<br><b>Version:</b> ${result.version ?? '-'}<br><b>EC Level:</b> ${(result.resultMetadata && result.resultMetadata.get(3)) || '-'}`;
-      scanResultImgBox.innerHTML = '';
+      if (scanResultImgBox) scanResultImgBox.innerHTML = '';
       useScanBtn.style.display = '';
       lastScanResult = result;
       addHistoryEntry('Scan', result.text, result.version, (result.resultMetadata && result.resultMetadata.get(3)) || '-');

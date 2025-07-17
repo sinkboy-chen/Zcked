@@ -11,12 +11,12 @@
 <body>
   <main class="container-fluid py-3">
     <!-- Remove the mobile tab navigation -->
-    <div class="row">
-      <div class="col-12 col-md-8">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 mx-auto" style="max-width: 600px;">
         <div class="tab-content">
           <div class="card mb-4 shadow-sm">
             <div class="card-header bg-deep">1. Scan QR Code</div>
-            <div class="card-body bg-sand">
+            <div class="card-body bg-sand p-3">
               <div class="d-flex gap-2 mb-3">
                 <button id="scan-mode-camera" class="btn btn-outline-deep" type="button">Camera</button>
                 <button id="scan-mode-image" class="btn btn-outline-deep" type="button">Image Upload</button>
@@ -31,13 +31,12 @@
                 <div class="qr-img-box" id="scan-img-box"></div>
               </div>
               <div id="scan-result-meta" class="meta mb-2"></div>
-              <div class="qr-img-box" id="scan-result-img-box"></div>
               <button id="use-scan-btn" class="btn btn-deep" style="display:none;">Use this for QR creation</button>
             </div>
           </div>
           <div class="card mb-4 shadow-sm">
             <div class="card-header bg-deep">2. Create/Edit QR Code</div>
-            <div class="card-body bg-sand">
+            <div class="card-body bg-sand p-3">
               <form id="create-form" onsubmit="return false;">
                 <div class="mb-3">
                   <label for="create-text" class="form-label">QR Data (Text)</label>
@@ -57,17 +56,17 @@
                       <option value="H" selected>H (High)</option>
                     </select>
                   </div>
-                  <div class="col-12 col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-deep flex-fill">Generate QR</button>
-                    <button type="button" id="clear-create-btn" class="btn btn-outline-deep flex-fill">Clear</button>
-                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-deep">Generate QR</button>
+                  <button type="button" id="clear-create-btn" class="btn btn-outline-deep">Clear</button>
                 </div>
               </form>
             </div>
           </div>
           <div class="card mb-4 shadow-sm">
             <div class="card-header bg-deep">3. Output</div>
-            <div class="card-body bg-sand">
+            <div class="card-body bg-sand p-3">
               <div class="qr-img-box mb-2" id="output-qr-box"></div>
               <div id="output-meta" class="meta mb-2"></div>
               <div class="d-flex gap-2 mb-2">
@@ -78,7 +77,7 @@
           </div>
           <div class="card mb-4 shadow-sm">
             <div class="card-header bg-deep">History</div>
-            <div class="card-body bg-sand">
+            <div class="card-body bg-sand p-3">
               <div id="history-list" style="max-height:300px; overflow-y:auto; background:#fafbfc; padding:0.5em;"></div>
             </div>
           </div>

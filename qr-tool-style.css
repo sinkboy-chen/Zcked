@@ -142,3 +142,28 @@ body { background: #fafbfc; font-family: 'Inter', 'Segoe UI', 'Arial', sans-seri
     max-width: 100vw;
   }
 } 
+
+#cameraSelectPanel {
+  width: 100%;
+  margin-bottom: 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25em;
+}
+#cameraSelectPanel label {
+  margin-bottom: 0.1em;
+  font-weight: 500;
+  color: #254441;
+  white-space: nowrap;
+}
+#cameraSelect {
+  max-width: 100%;
+  min-width: 120px;
+  width: auto;
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
+} 
