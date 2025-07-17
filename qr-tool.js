@@ -136,7 +136,7 @@ useScanBtn.onclick = function() {
   document.getElementById('create-text').focus();
   // Switch to create tab if on mobile
   if (window.innerWidth < 900) {
-    activateTab('create');
+    switchToTab('create');
   } else {
     window.scrollTo({top: document.getElementById('create-section').offsetTop - 10, behavior: 'smooth'});
   }
@@ -220,7 +220,7 @@ createForm.addEventListener('submit', function() {
     }
     // Switch to output tab if on mobile
     if (window.innerWidth < 900) {
-      activateTab('output');
+      switchToTab('output');
     } else {
       window.scrollTo({top: document.getElementById('output-section').offsetTop - 10, behavior: 'smooth'});
     }
@@ -281,6 +281,17 @@ function renderHistory() {
       document.getElementById('create-version').value = entry.version || '';
       document.getElementById('create-eclevel').value = entry.ecLevel || 'L';
       document.getElementById('create-text').focus();
+      if (window.innerWidth < 900) {
+        // Mobile: switch to edit tab
+        var tabBtn = document.getElementById('tab-create');
+        if (tabBtn) {
+          var tab = new bootstrap.Tab(tabBtn);
+          tab.show();
+        }
+      } else {
+        // Desktop: scroll to edit section
+        window.scrollTo({top: document.getElementById('create-section').offsetTop - 10, behavior: 'smooth'});
+      }
     };
     div.appendChild(qrCanvas);
     div.appendChild(info);
@@ -297,17 +308,15 @@ document.getElementById('clear-create-btn').onclick = function() {
 };
 
 // --- Tabbed navigation for mobile ---
-function activateTab(tab) {
-  const tabBtns = Array.from(document.querySelectorAll('.tab-btn'));
-  const tabSections = Array.from(document.querySelectorAll('[data-tab]'));
-  tabBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-  tabSections.forEach(sec => sec.classList.toggle('active', sec.dataset.tab === tab));
+// Use Bootstrap's Tab API to switch tabs programmatically
+function switchToTab(tabId) {
+  var tabBtn = document.getElementById('tab-' + tabId);
+  if (tabBtn) {
+    var tab = new bootstrap.Tab(tabBtn);
+    tab.show();
+  }
 }
 (function() {
-  const tabBtns = Array.from(document.querySelectorAll('.tab-btn'));
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => activateTab(btn.dataset.tab));
-  });
   // Default to scan tab on load
-  activateTab('scan');
+  switchToTab('scan');
 })(); 
