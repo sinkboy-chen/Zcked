@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator</title>
+  <style>
+    #qrcode {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>QR Code Generator</h2>
+  <form id="qr-form" onsubmit="return false;" style="margin-bottom:1em;">
+    <label>Text:<br>
+      <input type="text" id="qr-text" style="min-width:200px;" required value="Hello from QR!">
+    </label>
+    <label style="margin-left:1em;">Version:<br>
+      <input type="number" id="qr-version" min="1" max="40" placeholder="auto">
+    </label>
+    <label style="margin-left:1em;">EC Level:<br>
+      <select id="qr-eclevel">
+        <option value="L">L (Low)</option>
+        <option value="M">M (Medium)</option>
+        <option value="Q">Q (Quartile)</option>
+        <option value="H" selected>H (High)</option>
+      </select>
+    </label>
+    <button type="submit" style="margin-left:1em;">Generate QR</button>
+  </form>
+  <div id="qrcode"></div>
+  <div id="qr-meta" style="margin-top:0.5em;"></div>
+
+  <!-- Load qrcode.min.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    document.getElementById('qr-form').addEventListener('submit', function() {
+      const data = document.getElementById('qr-text').value;
+      const version = parseInt(document.getElementById('qr-version').value, 10);
+      const ecLevel = document.getElementById('qr-eclevel').value;
+      const container = document.getElementById('qrcode');
+      const metaDiv = document.getElementById('qr-meta');
+      container.innerHTML = '';
+      metaDiv.textContent = '';
+      if (!data) {
+        metaDiv.textContent = 'Please enter text.';
+        return;
+      }
+      const options = {
+        errorCorrectionLevel: ecLevel,
+        width: 256,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#ffffff"
+        }
+      };
+      if (!isNaN(version)) options.version = version;
+      const canvas = document.createElement('canvas');
+      QRCode.toCanvas(canvas, data, options, function (error) {
+        if (error) {
+          metaDiv.textContent = 'Error generating QR code.';
+          console.error(error);
+          return;
+        }
+        container.appendChild(canvas);
+        metaDiv.innerHTML = `<b>Text:</b> ${data}<br><b>Version:</b> ${!isNaN(version) ? version : 'auto'}<br><b>EC Level:</b> ${ecLevel}`;
+      });
+    });
+  </script>
+</body>
+</html>
