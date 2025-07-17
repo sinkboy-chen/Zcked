@@ -29,14 +29,16 @@
         </div>
       </div>
       <div id="image-section" style="display:none">
-        <input type="file" id="fileInput" accept="image/*">
-        <div>
-          <img id="img" style="max-width:300px; border:1px solid gray; display:none;">
+        <div style="display: flex; align-items: flex-start; gap: 1em; margin-bottom: 1em;">
+          <input type="file" id="fileInput" accept="image/*" style="margin: 0;">
+          <div id="img-container" style="min-width: 120px; min-height: 120px; display: flex; align-items: center; justify-content: center; background: #f8f8f8; border: 1px solid #eee;">
+            <!-- img will be inserted here -->
+          </div>
         </div>
-        <a class="button" id="decodeButton">Decode</a>
       </div>
       <label>Result:</label>
       <pre><code id="result"></code></pre>
+      <div id="qr-info"></div>
     </section>
   </main>
   <script src="library\dist\umd\index.min.js"></script>
@@ -68,6 +70,42 @@
       const sourceSelect = document.getElementById('sourceSelect');
       const sourceSelectPanel = document.getElementById('sourceSelectPanel');
 
+      function displayQRInfo(result) {
+        const infoDiv = document.getElementById('qr-info');
+        try {
+          // Text
+          let text = '-';
+          if (result && (typeof result.text === 'string' || (result.getText && typeof result.getText === 'function'))) {
+            text = result.text || (result.getText && result.getText()) || '-';
+            if (!text) text = '-';
+          }
+
+          // Version
+          let version = '-';
+          if (result && (typeof result.version === 'number' || typeof result.version === 'string')) {
+            version = result.version;
+          } else if (result && typeof result.versionNumber === 'number') {
+            version = result.versionNumber;
+          }
+
+          // EC Level
+          let ecLevel = '-';
+          if (result && result.resultMetadata && typeof result.resultMetadata.get === 'function') {
+            const ec = result.resultMetadata.get(3); // 3 is ERROR_CORRECTION_LEVEL
+            if (ec) ecLevel = ec;
+          }
+
+          infoDiv.innerHTML = `
+            <b>Text:</b> ${text}<br>
+            <b>Version:</b> ${version !== undefined && version !== null && version !== '' ? version : '-'}<br>
+            <b>EC Level:</b> ${ecLevel}
+          `;
+        } catch (e) {
+          infoDiv.innerHTML = '<span style="color:red;">Error displaying QR info.</span>';
+          console.error('Error displaying QR info:', e);
+        }
+      }
+
       // Camera logic
       function populateDeviceList(devices) {
         sourceSelect.innerHTML = '';
@@ -89,6 +127,7 @@
           if (devices.length === 0) {
             resultElem.textContent = 'No camera found.';
             console.error('No camera found.');
+            document.getElementById('qr-info').innerHTML = '';
             return;
           }
           selectedDeviceId = devices[0].deviceId;
@@ -96,52 +135,94 @@
           codeReader.decodeFromInputVideoDevice(selectedDeviceId, 'video').then(result => {
             console.log(result);
             resultElem.textContent = result.text;
+            displayQRInfo(result);
             codeReader.getVideoInputDevices().then(populateDeviceList);
           }).catch(err => {
             console.error(err);
             resultElem.textContent = err;
+            document.getElementById('qr-info').innerHTML = '';
             codeReader.getVideoInputDevices().then(populateDeviceList);
           });
         }).catch(err => {
           resultElem.textContent = 'No camera found.';
+          document.getElementById('qr-info').innerHTML = '';
           console.error('No camera found.', err);
         });
+      });
+
+      // Image logic
+      const fileInput = document.getElementById('fileInput');
+      const imgContainer = document.getElementById('img-container');
+      let currentObjectUrl = null;
+
+      // Handle image upload and preview/decoding
+      fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        // Revoke previous object URL if any
+        if (currentObjectUrl) {
+          URL.revokeObjectURL(currentObjectUrl);
+          currentObjectUrl = null;
+        }
+        // Remove old img if present
+        let oldImg = document.getElementById('img');
+        if (oldImg && oldImg.parentNode === imgContainer) imgContainer.removeChild(oldImg);
+
+        if (file) {
+          // Create new img element for each upload
+          const newImg = document.createElement('img');
+          newImg.id = 'img';
+          newImg.style.maxWidth = '300px';
+          newImg.style.maxHeight = '200px';
+          newImg.style.border = '1px solid #ccc';
+          newImg.style.background = '#fff';
+          newImg.style.display = 'none';
+          imgContainer.appendChild(newImg);
+          currentObjectUrl = URL.createObjectURL(file);
+          newImg.onload = function() {
+            newImg.style.display = '';
+            console.log('Started decode for image from', newImg.src);
+            codeReader.decodeFromImage(newImg).then(result => {
+              console.log(result);
+              resultElem.textContent = result.text;
+              displayQRInfo(result);
+            }).catch(err => {
+              console.error(err);
+              // Handle 'no QR code found' gracefully
+              let msg = 'An error occurred while decoding.';
+              if (err && (err.message === 'No QR code found' || err.name === 'NotFoundException' || err === 'NotFoundException' || err === 'N')) {
+                msg = 'No QR code detected in the image.';
+              }
+              resultElem.textContent = msg;
+              document.getElementById('qr-info').innerHTML = '';
+            });
+          };
+          newImg.onerror = function() {
+            resultElem.textContent = '';
+            document.getElementById('qr-info').innerHTML = '';
+          };
+          newImg.src = currentObjectUrl;
+        } else {
+          resultElem.textContent = '';
+          document.getElementById('qr-info').innerHTML = '';
+        }
+        // Reset file input so the same file can be uploaded again
+        fileInput.value = '';
       });
 
       document.getElementById('resetButton').addEventListener('click', () => {
         codeReader.reset();
         resultElem.textContent = '';
+        document.getElementById('qr-info').innerHTML = '';
+        // Optionally clear image preview on reset
+        if (currentObjectUrl) {
+          URL.revokeObjectURL(currentObjectUrl);
+          currentObjectUrl = null;
+        }
+        let oldImg = document.getElementById('img');
+        if (oldImg && oldImg.parentNode === imgContainer) {
+          imgContainer.removeChild(oldImg);
+        }
         console.log('Reset.');
-      });
-
-      // Image logic
-      const fileInput = document.getElementById('fileInput');
-      const img = document.getElementById('img');
-      fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          img.src = URL.createObjectURL(file);
-          img.style.display = '';
-        } else {
-          img.src = '';
-          img.style.display = 'none';
-        }
-        resultElem.textContent = '';
-      });
-
-      document.getElementById('decodeButton').addEventListener('click', function() {
-        if (!img.src) {
-          resultElem.textContent = 'Please select an image.';
-          return;
-        }
-        console.log('Started decode for image from', img.src);
-        codeReader.decodeFromImage(img).then(result => {
-          console.log(result);
-          resultElem.textContent = result.text;
-        }).catch(err => {
-          console.error(err);
-          resultElem.textContent = err;
-        });
       });
     });
   </script>
